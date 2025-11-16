@@ -1,6 +1,7 @@
 // API Configuration
 const CONFIG = {
-    API_BASE_URL: 'http://localhost:8000',
+    // Automatically detect API base URL (works for any host/port)
+    API_BASE_URL: window.location.origin,
     API_VERSION: 'v1',
 
     // Storage keys
@@ -29,6 +30,7 @@ const CONFIG = {
         },
         USERS: {
             LIST: '/api/v1/users',
+            CREATE: '/api/v1/users',
             ME: '/api/v1/users/me',
             GET: (id) => `/api/v1/users/${id}`,
             UPDATE: (id) => `/api/v1/users/${id}`,

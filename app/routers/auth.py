@@ -18,12 +18,13 @@ Authentication Flow:
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import RedirectResponse, JSONResponse, HTMLResponse
 from sqlalchemy.orm import Session
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from google_auth_oauthlib.flow import Flow
 import logging
+import json
 from typing import Dict
 
 from app.database import get_db
@@ -253,7 +254,79 @@ async def google_callback(
 
         logger.info(f"Login successful for {email}")
 
-        return JSONResponse(content=token_response)
+        # Return HTML page with JavaScript to store tokens and redirect
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Login Successful</title>
+            <style>
+                body {{
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                }}
+                .container {{
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 10px;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+                    text-align: center;
+                }}
+                .spinner {{
+                    border: 3px solid #f3f3f3;
+                    border-top: 3px solid #4CAF50;
+                    border-radius: 50%;
+                    width: 40px;
+                    height: 40px;
+                    animation: spin 1s linear infinite;
+                    margin: 20px auto;
+                }}
+                @keyframes spin {{
+                    0% {{ transform: rotate(0deg); }}
+                    100% {{ transform: rotate(360deg); }}
+                }}
+                h2 {{ color: #333; margin-bottom: 10px; }}
+                p {{ color: #666; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="spinner"></div>
+                <h2>Login Successful!</h2>
+                <p>Redirecting to dashboard...</p>
+            </div>
+            <script>
+                // Store tokens in localStorage
+                const authData = {json.dumps(token_response)};
+
+                // Store access token
+                localStorage.setItem('access_token', authData.access_token);
+
+                // Store refresh token
+                if (authData.refresh_token) {{
+                    localStorage.setItem('refresh_token', authData.refresh_token);
+                }}
+
+                // Store user data
+                if (authData.user) {{
+                    localStorage.setItem('user_data', JSON.stringify(authData.user));
+                }}
+
+                // Redirect to dashboard after a short delay
+                setTimeout(() => {{
+                    window.location.href = '/';
+                }}, 1000);
+            </script>
+        </body>
+        </html>
+        """
+
+        return HTMLResponse(content=html_content)
 
     except HTTPException:
         raise

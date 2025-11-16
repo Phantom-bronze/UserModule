@@ -45,19 +45,6 @@ from app.schemas.invitation import (
     InvitationAccept
 )
 
-from app.schemas.google_credential import (
-    GoogleCredentialCreate,
-    GoogleCredentialUpdate,
-    GoogleCredentialResponse
-)
-
-from app.schemas.device import (
-    DeviceCreate,
-    DeviceUpdate,
-    DeviceResponse,
-    DeviceLinkRequest
-)
-
 from app.schemas.auth import (
     LoginRequest,
     TokenResponse,
@@ -82,17 +69,6 @@ __all__ = [
     "InvitationCreate",
     "InvitationResponse",
     "InvitationAccept",
-
-    # Google credential schemas
-    "GoogleCredentialCreate",
-    "GoogleCredentialUpdate",
-    "GoogleCredentialResponse",
-
-    # Device schemas
-    "DeviceCreate",
-    "DeviceUpdate",
-    "DeviceResponse",
-    "DeviceLinkRequest",
 
     # Auth schemas
     "LoginRequest",

@@ -113,7 +113,7 @@ class Settings(BaseSettings):
         description="Google OAuth redirect URI"
     )
     GOOGLE_SCOPES: str = Field(
-        default="openid,email,profile,https://www.googleapis.com/auth/drive.readonly",
+        default="openid,email,profile",
         description="Google OAuth scopes (comma-separated)"
     )
 
@@ -146,33 +146,6 @@ class Settings(BaseSettings):
         description="From name for emails"
     )
 
-    # ============================================================
-    # Redis Configuration
-    # ============================================================
-    REDIS_URL: str = Field(
-        default="redis://localhost:6379/0",
-        description="Redis URL for Celery"
-    )
-
-    # ============================================================
-    # File Storage Configuration
-    # ============================================================
-    LOCAL_STORAGE_PATH: str = Field(
-        default="./storage/content",
-        description="Local storage path for content"
-    )
-    MAX_UPLOAD_SIZE_MB: int = Field(
-        default=500,
-        description="Maximum file upload size in MB"
-    )
-    ALLOWED_IMAGE_EXTENSIONS: str = Field(
-        default="jpg,jpeg,png,gif,webp",
-        description="Allowed image file extensions"
-    )
-    ALLOWED_VIDEO_EXTENSIONS: str = Field(
-        default="mp4,avi,mov,wmv,flv,webm",
-        description="Allowed video file extensions"
-    )
 
     # ============================================================
     # Application Limits
@@ -209,17 +182,6 @@ class Settings(BaseSettings):
         description="Initial super admin name"
     )
 
-    # ============================================================
-    # WebSocket Configuration
-    # ============================================================
-    WS_PING_INTERVAL: int = Field(
-        default=30,
-        description="WebSocket ping interval in seconds"
-    )
-    WS_PING_TIMEOUT: int = Field(
-        default=10,
-        description="WebSocket ping timeout in seconds"
-    )
 
     # ============================================================
     # Device Configuration
@@ -303,19 +265,6 @@ class Settings(BaseSettings):
         """
         return [scope.strip() for scope in v.split(",") if scope.strip()]
 
-    @validator("ALLOWED_IMAGE_EXTENSIONS", "ALLOWED_VIDEO_EXTENSIONS")
-    def validate_extensions(cls, v: str) -> List[str]:
-        """
-        Validate and parse file extensions from comma-separated string to list.
-
-        Args:
-            v: Comma-separated string of extensions
-
-        Returns:
-            List of extension strings
-        """
-        return [ext.strip().lower() for ext in v.split(",") if ext.strip()]
-
     @validator("DATABASE_URL")
     def validate_database_url(cls, v: str) -> str:
         """
@@ -330,8 +279,8 @@ class Settings(BaseSettings):
         Raises:
             ValueError: If database URL is invalid
         """
-        if not v.startswith("postgresql://"):
-            raise ValueError("DATABASE_URL must start with 'postgresql://'")
+        if not (v.startswith("postgresql://") or v.startswith("postgresql+psycopg://") or v.startswith("postgresql+pg8000://")):
+            raise ValueError("DATABASE_URL must start with 'postgresql://', 'postgresql+psycopg://', or 'postgresql+pg8000://'")
         return v
 
     @validator("SECRET_KEY", "ENCRYPTION_KEY")

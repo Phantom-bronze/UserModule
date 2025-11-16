@@ -43,6 +43,14 @@ function showDashboardPage() {
 async function initApp() {
     console.log('Initializing app...');
 
+    // Handle OAuth callback first (if applicable)
+    const handledCallback = handleOAuthCallback();
+    if (handledCallback) {
+        // Callback was handled, dashboard is already showing
+        setupEventListeners();
+        return;
+    }
+
     // Check if user is already logged in
     const token = api.getAccessToken();
     if (token) {
@@ -91,9 +99,6 @@ function setupEventListeners() {
     document.getElementById('refresh-btn').addEventListener('click', () => {
         loadPage(app.currentPage);
     });
-
-    // Handle OAuth callback
-    handleOAuthCallback();
 }
 
 // Handle Google Login
@@ -142,14 +147,52 @@ async function handleManualLogin() {
 
 // Handle OAuth Callback
 function handleOAuthCallback() {
+    // Check if we're on the callback page with JSON response
+    const pageText = document.body.textContent || document.body.innerText;
+
+    // Try to parse the page as JSON (OAuth callback returns JSON)
+    try {
+        const authResponse = JSON.parse(pageText);
+
+        // If we successfully parsed JSON with tokens, store them
+        if (authResponse.access_token && authResponse.user) {
+            console.log('OAuth callback successful, storing tokens...');
+
+            // Store tokens
+            api.setAccessToken(authResponse.access_token);
+            if (authResponse.refresh_token) {
+                api.setRefreshToken(authResponse.refresh_token);
+            }
+
+            // Store user data
+            localStorage.setItem(CONFIG.STORAGE_KEYS.USER_DATA, JSON.stringify(authResponse.user));
+            app.currentUser = authResponse.user;
+
+            // Clear the URL and redirect to dashboard
+            window.history.replaceState({}, document.title, '/');
+
+            // Load dashboard
+            showToast(`Welcome ${authResponse.user.full_name}! You are now logged in as ${authResponse.user.role}.`, 'success');
+            loadUserData();
+            showDashboardPage();
+            loadPage('overview');
+
+            return true;
+        }
+    } catch (e) {
+        // Not JSON, continue with normal flow
+    }
+
+    // Check for OAuth code in URL params (alternative flow)
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
 
     if (code) {
-        console.log('OAuth callback detected, code:', code);
-        showToast('OAuth callback detected. Please exchange code for token manually.', 'warning');
-        // In a production app, you would exchange the code for tokens here
+        console.log('OAuth code detected, but already handled by backend');
+        // The backend already handled the code exchange
     }
+
+    return false;
 }
 
 // Handle Logout
@@ -356,11 +399,16 @@ async function loadCompaniesPage(container) {
 // Load Users Page
 async function loadUsersPage(container) {
     const users = await api.listUsers();
+    const companies = app.currentUser.role === 'super_admin' ? await api.listCompanies() : [];
+
+    // Only super admins can create users
+    const canCreateUsers = app.currentUser.role === 'super_admin';
 
     container.innerHTML = `
         <div class="card">
             <div class="card-header">
                 <h2>All Users</h2>
+                ${canCreateUsers ? '<button class="btn-secondary" onclick="showCreateUserModal()">+ Add User</button>' : ''}
             </div>
             <div class="table-container">
                 <table>
@@ -393,6 +441,55 @@ async function loadUsersPage(container) {
                         `).join('')}
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- User Creation Modal -->
+        <div id="createUserModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add New User</h2>
+                    <button class="btn-close" onclick="hideCreateUserModal()">&times;</button>
+                </div>
+                <form id="createUserForm" onsubmit="handleCreateUser(event)">
+                    <div class="form-group">
+                        <label for="user-email">Email Address *</label>
+                        <input type="email" id="user-email" name="email" required
+                               placeholder="user@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-fullname">Full Name *</label>
+                        <input type="text" id="user-fullname" name="full_name" required
+                               placeholder="John Doe" minlength="2">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-role">Role *</label>
+                        <select id="user-role" name="role" required>
+                            <option value="">Select a role</option>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-company">Company *</label>
+                        <select id="user-company" name="company_id" required>
+                            <option value="">Select a company</option>
+                            ${companies.map(company => `
+                                <option value="${company.id}">${company.name}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="user-can-add-devices" name="can_add_devices">
+                            Can add devices
+                        </label>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="hideCreateUserModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Create User</button>
+                    </div>
+                </form>
             </div>
         </div>
     `;
@@ -500,6 +597,41 @@ async function loadInvitationsPage(container) {
             </div>
         </div>
     `;
+}
+
+// User Management Functions
+function showCreateUserModal() {
+    document.getElementById('createUserModal').classList.remove('hidden');
+}
+
+function hideCreateUserModal() {
+    document.getElementById('createUserModal').classList.add('hidden');
+    document.getElementById('createUserForm').reset();
+}
+
+async function handleCreateUser(event) {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    const userData = {
+        email: formData.get('email'),
+        full_name: formData.get('full_name'),
+        role: formData.get('role'),
+        company_id: formData.get('company_id'),
+        can_add_devices: formData.get('can_add_devices') === 'on'
+    };
+
+    try {
+        showLoading();
+        await api.createUser(userData);
+        showToast('User created successfully!', 'success');
+        hideCreateUserModal();
+        loadPage('users'); // Reload the users page
+    } catch (error) {
+        showToast('Failed to create user: ' + error.message, 'error');
+    } finally {
+        hideLoading();
+    }
 }
 
 // Placeholder functions for actions

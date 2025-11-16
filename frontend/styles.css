@@ -496,18 +496,178 @@ tr:last-child td {
     background: var(--danger);
 }
 
-/* Responsive */
+/* Responsive - Mobile First */
 @media (max-width: 768px) {
+    /* Tablet/Small Desktop */
     .sidebar {
         width: 200px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .content-area {
+        padding: 20px 15px;
+    }
+
+    .card-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .card-header h2 {
+        font-size: 16px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 10px 12px;
+    }
+}
+
+@media (max-width: 640px) {
+    /* Mobile Phones */
+    #dashboard-page {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-nav {
+        padding: 10px 0;
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .nav-item {
+        padding: 10px 15px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        display: inline-flex;
+    }
+
+    .nav-item.active {
+        border-left: none;
+        border-bottom-color: var(--primary);
+    }
+
+    .sidebar-footer {
+        padding: 15px;
     }
 
     .stats-grid {
         grid-template-columns: 1fr;
     }
 
+    .stat-card .value {
+        font-size: 28px;
+    }
+
+    .content-header {
+        padding: 15px 20px;
+    }
+
+    .content-header h1 {
+        font-size: 20px;
+    }
+
     .content-area {
+        padding: 15px;
+    }
+
+    /* Make tables scrollable on mobile */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        min-width: 600px;
+        font-size: 13px;
+    }
+
+    /* Modal adjustments for mobile */
+    .modal-content {
+        width: 95%;
         padding: 20px;
+        max-height: 90vh;
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+    }
+
+    .modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .modal-footer button {
+        width: 100%;
+    }
+
+    /* Form adjustments */
+    .form-group input,
+    .form-group select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    /* Toast on mobile */
+    .toast {
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+        text-align: center;
+    }
+
+    /* Login page mobile */
+    .login-card {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+
+    .login-card h1 {
+        font-size: 24px;
+    }
+}
+
+/* Landscape orientation */
+@media (max-width: 900px) and (orientation: landscape) {
+    .sidebar {
+        width: 180px;
+    }
+
+    .content-header {
+        padding: 12px 20px;
+    }
+}
+
+/* Touch-friendly button sizes */
+@media (hover: none) and (pointer: coarse) {
+    .btn-primary,
+    .btn-secondary,
+    .btn-google {
+        min-height: 44px; /* iOS recommended touch target size */
+        padding: 12px 20px;
+    }
+
+    .btn-icon {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .nav-item {
+        min-height: 48px;
     }
 }
 

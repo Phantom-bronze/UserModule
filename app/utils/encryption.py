@@ -25,7 +25,7 @@ IMPORTANT:
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
 import os
 import secrets
@@ -66,7 +66,7 @@ def _derive_key(password: str, salt: bytes = None) -> tuple[bytes, bytes]:
     if salt is None:
         salt = secrets.token_bytes(16)  # 16 bytes = 128 bits
 
-    kdf = PBKDF2(
+    kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,  # 32 bytes = 256 bits for AES-256
         salt=salt,

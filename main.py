@@ -19,25 +19,26 @@ Run the application:
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import logging
 import time
 from typing import AsyncGenerator
+from pathlib import Path
 
 from app.config import settings
 from app.database import init_db, check_db_connection
 from app.utils.encryption import validate_encryption_key
 
-# Import routers (will be created)
+# Import routers
 from app.routers import (
     auth,
     users,
     companies,
     devices,
     invitations,
-    google_drive,
     health
 )
 
@@ -201,10 +202,10 @@ async def general_exception_handler(request: Request, exc: Exception):
 # Root Endpoint
 # ============================================================
 
-@app.get("/", tags=["Root"])
+@app.get("/api", tags=["Root"])
 async def root():
     """
-    Root endpoint - API information.
+    API root endpoint - API information.
     """
     return {
         "name": settings.APP_NAME,
@@ -258,11 +259,25 @@ app.include_router(
     tags=["Invitations"]
 )
 
-app.include_router(
-    google_drive.router,
-    prefix=f"{API_V1_PREFIX}/google-drive",
-    tags=["Google Drive"]
-)
+
+# ============================================================
+# Static Files - Frontend UI
+# ============================================================
+
+# Mount static files directory
+frontend_path = Path(__file__).parent / "frontend"
+if frontend_path.exists():
+    app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
+
+    # Serve index.html at root
+    @app.get("/", response_class=FileResponse)
+    async def serve_frontend():
+        """Serve the frontend application."""
+        return FileResponse(str(frontend_path / "index.html"))
+
+    logger.info(f"Frontend UI mounted at / from {frontend_path}")
+else:
+    logger.warning(f"Frontend directory not found at {frontend_path}")
 
 
 # ============================================================

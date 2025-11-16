@@ -26,6 +26,7 @@ from app.models.user import User, UserRole
 from app.models.company import Company
 from app.schemas.user import (
     UserResponse,
+    UserCreate,
     UserUpdate,
     UserPermissionsUpdate,
     UserListResponse
@@ -43,12 +44,99 @@ router = APIRouter()
 
 
 # ============================================================
+# User Creation
+# ============================================================
+
+@router.post(
+    "",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create new user"
+)
+async def create_user(
+    user_data: UserCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_super_admin())
+):
+    """
+    Create a new user (Super Admin only).
+
+    This endpoint allows super admins to create users directly without
+    going through the invitation process. The user will be created with
+    the specified role and company.
+
+    Args:
+        user_data: User creation data
+        db: Database session
+        current_user: Current super admin user
+
+    Returns:
+        UserResponse: Created user details
+
+    Raises:
+        HTTPException 400: If email already exists or validation fails
+        HTTPException 403: If not a super admin
+        HTTPException 404: If company not found
+    """
+    # Check if user with this email already exists
+    existing_user = db.query(User).filter(User.email == user_data.email).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this email already exists"
+        )
+
+    # Validate company exists if company_id is provided
+    if user_data.company_id:
+        company = db.query(Company).filter(Company.id == user_data.company_id).first()
+        if not company:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Company not found"
+            )
+
+        # Check if company can add more users
+        if not company.can_add_user():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Company has reached maximum user limit ({company.max_users})"
+            )
+
+    try:
+        # Create new user
+        new_user = User(
+            email=user_data.email,
+            full_name=user_data.full_name,
+            role=user_data.role,
+            company_id=user_data.company_id,
+            can_add_devices=user_data.can_add_devices,
+            is_active=True
+        )
+
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+        logger.info(f"User created: {new_user.email} by {current_user.email}")
+
+        return new_user
+
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to create user: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create user"
+        )
+
+
+# ============================================================
 # User Listing and Retrieval
 # ============================================================
 
 @router.get(
     "",
-    response_model=List[UserListResponse],
+    response_model=List[UserResponse],
     summary="List users"
 )
 async def list_users(
@@ -76,7 +164,7 @@ async def list_users(
         current_user: Current user
 
     Returns:
-        List[UserListResponse]: List of users
+        List[UserResponse]: List of users
     """
     query = db.query(User)
 
@@ -97,22 +185,8 @@ async def list_users(
     # Get users
     users = query.offset(skip).limit(limit).all()
 
-    # Format response
-    result = []
-    for user in users:
-        result.append({
-            "id": str(user.id),
-            "email": user.email,
-            "full_name": user.full_name,
-            "role": user.role.value,
-            "company_id": str(user.company_id) if user.company_id else None,
-            "can_add_devices": user.can_add_devices,
-            "is_active": user.is_active,
-            "created_at": user.created_at.isoformat() if user.created_at else None,
-            "last_login": user.last_login.isoformat() if user.last_login else None
-        })
-
-    return result
+    # Return users directly (FastAPI will serialize using UserResponse schema)
+    return users
 
 
 @router.get(

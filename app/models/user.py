@@ -19,7 +19,7 @@ Each user authenticates via Google SSO (Single Sign-On) and can:
 from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 import enum
 
@@ -69,7 +69,6 @@ class User(Base):
     Relationships:
         company: The company this user belongs to (Many-to-One with Company)
         devices: List of devices owned by this user (One-to-Many with Device)
-        google_drive_token: Google Drive access token for this user (One-to-One)
         invitations_sent: Invitations sent by this user (One-to-Many with Invitation)
         audit_logs: Audit logs for actions performed by this user (One-to-Many)
 
@@ -187,15 +186,15 @@ class User(Base):
     # ========================================
     created_at = Column(
         DateTime,
-        default=datetime.utcnow,
+        default=lambda: datetime.now(timezone.utc),
         nullable=False,
         comment="Timestamp when the account was created"
     )
 
     updated_at = Column(
         DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
         comment="Timestamp when the account was last updated"
     )
@@ -226,13 +225,14 @@ class User(Base):
     )
 
     # One-to-One: User has one Google Drive Token
-    google_drive_token = relationship(
-        "GoogleDriveToken",
-        back_populates="user",
-        uselist=False,  # One-to-One relationship
-        cascade="all, delete-orphan",
-        lazy="select"
-    )
+    # TODO: Uncomment when GoogleDriveToken model is implemented
+    # google_drive_token = relationship(
+    #     "GoogleDriveToken",
+    #     back_populates="user",
+    #     uselist=False,  # One-to-One relationship
+    #     cascade="all, delete-orphan",
+    #     lazy="select"
+    # )
 
     # One-to-Many: User can send multiple Invitations
     invitations_sent = relationship(
@@ -331,7 +331,7 @@ class User(Base):
 
         This method should be called whenever the user successfully logs in.
         """
-        self.last_login = datetime.utcnow()
+        self.last_login = datetime.now(timezone.utc)
 
     # ========================================
     # String Representation

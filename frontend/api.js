@@ -182,6 +182,10 @@ class ApiClient {
         return this.get(`${CONFIG.ENDPOINTS.USERS.LIST}?${query}`);
     }
 
+    async createUser(data) {
+        return this.post(CONFIG.ENDPOINTS.USERS.CREATE, data);
+    }
+
     async getUser(id) {
         return this.get(CONFIG.ENDPOINTS.USERS.GET(id));
     }

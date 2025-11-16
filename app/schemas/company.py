@@ -28,7 +28,7 @@ class CompanyCreate(BaseModel):
         return v.lower() if v else None
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "name": "Acme Corporation",
                 "subdomain": "acme",
@@ -70,7 +70,7 @@ class CompanyResponse(BaseModel):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CompanyListResponse(BaseModel):
@@ -98,7 +98,7 @@ class CompanyStatsResponse(BaseModel):
     devices: dict
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "company_id": "550e8400-e29b-41d4-a716-446655440000",
                 "company_name": "Acme Corporation",

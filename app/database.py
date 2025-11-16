@@ -21,7 +21,7 @@ Usage in API routes:
         return users
 """
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import QueuePool
@@ -285,7 +285,7 @@ def check_db_connection() -> bool:
         db = SessionLocal()
 
         # Execute a simple query to test the connection
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
 
         # Close the session
         db.close()

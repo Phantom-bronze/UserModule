@@ -1,0 +1,70 @@
+═══════════════════════════════════════════════════════════
+    🚀 SIMPLE DIGITAL SIGNAGE - SUPER EASY SETUP
+═══════════════════════════════════════════════════════════
+
+Hi! I've set up EVERYTHING for you to make this super easy!
+
+Your computer needs Python and PostgreSQL installed first.
+Don't worry - I've created scripts that guide you through it!
+
+═══════════════════════════════════════════════════════════
+                    JUST DO THIS:
+═══════════════════════════════════════════════════════════
+
+STEP 1: Install Prerequisites (10 minutes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    👉 Double-click: INSTALL_PREREQUISITES.bat
+
+    This will:
+    ✅ Check what you need
+    ✅ Open download pages
+    ✅ Guide you through installation
+
+    IMPORTANT when installing Python:
+    ⚠️  CHECK the box: "Add Python to PATH"
+
+    IMPORTANT when installing PostgreSQL:
+    ⚠️  Remember the password you create!
+
+
+STEP 2: Automatic Setup (3 minutes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    👉 Double-click: COMPLETE_SETUP.bat
+
+    This does EVERYTHING automatically:
+    ✅ Creates database
+    ✅ Configures environment
+    ✅ Installs dependencies
+    ✅ Loads sample data
+    ✅ Starts the application
+
+    You'll only be asked for:
+    - Your PostgreSQL password (from Step 1)
+
+
+STEP 3: Open the App (1 minute)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    👉 Open: frontend\index.html
+
+    Then click "Sign in with Google"
+
+    🎉 You're now the Super Admin!
+
+
+THAT'S IT! 15 minutes total.
+═══════════════════════════════════════════════════════════
+
+Every time after that:
+    1. Double-click: run_local.bat
+    2. Open: frontend\index.html
+
+═══════════════════════════════════════════════════════════
+
+Need help? Read: START_HERE_EASY.md
+
+═══════════════════════════════════════════════════════════
+           Ready? Double-click INSTALL_PREREQUISITES.bat!
+═══════════════════════════════════════════════════════════

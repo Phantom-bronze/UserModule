@@ -47,7 +47,6 @@ class Company(Base):
     Relationships:
         users: List of users belonging to this company (One-to-Many with User)
         devices: List of devices belonging to this company (One-to-Many with Device)
-        google_credential: Google Cloud credentials for this company (One-to-One)
         invitations: Invitations sent for this company (One-to-Many with Invitation)
 
     Database Table: companies
@@ -179,13 +178,14 @@ class Company(Base):
     )
 
     # One-to-One: Company has one Google Credential
-    google_credential = relationship(
-        "GoogleCredential",
-        back_populates="company",
-        uselist=False,  # One-to-One relationship
-        cascade="all, delete-orphan",
-        lazy="select"
-    )
+    # TODO: Uncomment when GoogleCredential model is implemented
+    # google_credential = relationship(
+    #     "GoogleCredential",
+    #     back_populates="company",
+    #     uselist=False,  # One-to-One relationship
+    #     cascade="all, delete-orphan",
+    #     lazy="select"
+    # )
 
     # One-to-Many: Company has multiple Invitations
     invitations = relationship(

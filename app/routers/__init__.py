@@ -8,7 +8,6 @@ This package contains all API route handlers organized by feature:
 - companies: Company management
 - devices: Device management
 - invitations: User invitation system
-- google_drive: Google Drive integration
 - health: Health checks and system status
 """
 
@@ -18,7 +17,6 @@ from app.routers import (
     companies,
     devices,
     invitations,
-    google_drive,
     health
 )
 
@@ -28,6 +26,5 @@ __all__ = [
     "companies",
     "devices",
     "invitations",
-    "google_drive",
     "health"
 ]

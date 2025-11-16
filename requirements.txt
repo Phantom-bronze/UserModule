@@ -9,8 +9,8 @@ fastapi==0.109.0
 
 # ASGI Server
 # -----------
-# Uvicorn: Lightning-fast ASGI server for production deployment
-uvicorn[standard]==0.27.0
+# Uvicorn: Lightning-fast ASGI server (pure Python for ARM64 compatibility)
+uvicorn==0.27.0
 
 # Database
 # --------
@@ -20,8 +20,8 @@ sqlalchemy==2.0.25
 # Alembic: Database migration tool for SQLAlchemy
 alembic==1.13.1
 
-# psycopg2-binary: PostgreSQL adapter for Python
-psycopg2-binary==2.9.9
+# psycopg: PostgreSQL adapter for Python (pure Python for ARM64)
+psycopg==3.2.4
 
 # Authentication & Security
 # -------------------------
@@ -34,19 +34,13 @@ passlib[bcrypt]==1.7.4
 # python-multipart: Streaming multipart parser for Python
 python-multipart==0.0.6
 
-# Google OAuth & Drive
-# --------------------
+# Google OAuth
+# ------------
 # google-auth: Google authentication library
 google-auth==2.27.0
 
 # google-auth-oauthlib: Google OAuth2.0 library
 google-auth-oauthlib==1.2.0
-
-# google-auth-httplib2: HTTP library integration for google-auth
-google-auth-httplib2==0.2.0
-
-# google-api-python-client: Google API client library
-google-api-python-client==2.116.0
 
 # Validation & Serialization
 # ---------------------------
@@ -65,46 +59,7 @@ email-validator==2.1.0
 python-dotenv==1.0.1
 
 # cryptography: Cryptographic recipes and primitives for Python
-cryptography==42.0.1
+cryptography>=42.0.1
 
 # Encryption library for sensitive data
-pycryptodome==3.20.0
-
-# HTTP Client
-# -----------
-# httpx: Next-generation HTTP client for Python
-httpx==0.26.0
-
-# CORS & Middleware
-# -----------------
-# Already included in FastAPI, but explicitly listed for clarity
-
-# Testing (Development)
-# ---------------------
-pytest==7.4.4
-pytest-asyncio==0.23.3
-httpx==0.26.0  # For testing async endpoints
-
-# Code Quality (Development)
-# ---------------------------
-black==24.1.1  # Code formatter
-flake8==7.0.0  # Code linter
-mypy==1.8.0    # Static type checker
-
-# Background Tasks
-# ----------------
-# celery: Distributed task queue (for future content processing)
-celery==5.3.6
-
-# redis: Redis client for Celery backend
-redis==5.0.1
-
-# WebSocket Support
-# -----------------
-# websockets: WebSocket client and server library
-websockets==12.0
-
-# Monitoring & Logging
-# --------------------
-# python-json-logger: JSON formatter for Python logging
-python-json-logger==2.0.7
+pycryptodome>=3.20.0

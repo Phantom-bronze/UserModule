@@ -1,0 +1,201 @@
+================================================================================
+                    🚂 RAILWAY DEPLOYMENT CHECKLIST
+================================================================================
+
+Repository: https://github.com/Phantom-bronze/UserModule.git
+
+================================================================================
+STEP 1: CREATE RAILWAY ACCOUNT
+================================================================================
+[ ] Go to: https://railway.app
+[ ] Click "Login"
+[ ] Choose "Login with GitHub"
+[ ] Authorize Railway
+
+================================================================================
+STEP 2: DEPLOY FROM GITHUB
+================================================================================
+[ ] Click "New Project"
+[ ] Select "Deploy from GitHub repo"
+[ ] Choose: Phantom-bronze/UserModule
+[ ] Click "Deploy Now"
+[ ] Wait ~2-3 minutes for build
+
+================================================================================
+STEP 3: ADD DATABASE
+================================================================================
+[ ] Click "+ New" button
+[ ] Select "Database"
+[ ] Choose "Add PostgreSQL"
+[ ] Wait ~30 seconds
+
+================================================================================
+STEP 4: GENERATE SECURE KEYS
+================================================================================
+Run these commands to generate keys:
+
+python -c "import secrets; print('SECRET_KEY=' + secrets.token_hex(32))"
+python -c "import secrets; print('ENCRYPTION_KEY=' + secrets.token_hex(32))"
+
+[ ] Copy SECRET_KEY
+[ ] Copy ENCRYPTION_KEY
+[ ] Save both for next step
+
+================================================================================
+STEP 5: SET ENVIRONMENT VARIABLES
+================================================================================
+[ ] Click on your web service (not database)
+[ ] Go to "Variables" tab
+[ ] Click "Raw Editor"
+[ ] Paste this template (update the values!):
+
+--------------------------------------------------------------------------------
+APP_ENV=production
+APP_NAME=Simple Digital Signage
+APP_VERSION=1.0.0
+DEBUG=False
+HOST=0.0.0.0
+
+SECRET_KEY=<paste-your-generated-key>
+ENCRYPTION_KEY=<paste-your-generated-key>
+ALGORITHM=HS256
+
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_DAYS=7
+INVITATION_TOKEN_EXPIRE_HOURS=72
+
+GOOGLE_CLIENT_ID=<your-client-id>.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=<your-client-secret>
+GOOGLE_SCOPES=openid,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/userinfo.profile
+
+CORS_ORIGINS=*
+CORS_ALLOW_CREDENTIALS=True
+
+LOG_LEVEL=INFO
+LOG_FORMAT=json
+--------------------------------------------------------------------------------
+
+[ ] Update SECRET_KEY with generated key
+[ ] Update ENCRYPTION_KEY with generated key
+[ ] Update GOOGLE_CLIENT_ID
+[ ] Update GOOGLE_CLIENT_SECRET
+[ ] Click "Save"
+
+================================================================================
+STEP 6: GENERATE DOMAIN
+================================================================================
+[ ] Click "Settings" tab
+[ ] Scroll to "Networking" section
+[ ] Click "Generate Domain"
+[ ] Copy your domain (e.g., your-app.up.railway.app)
+
+My Railway Domain: _____________________________________________
+
+================================================================================
+STEP 7: UPDATE GOOGLE OAUTH
+================================================================================
+[ ] Go to: https://console.cloud.google.com
+[ ] Navigate to: APIs & Services → Credentials
+[ ] Click your OAuth 2.0 Client ID
+[ ] Add to "Authorized redirect URIs":
+    https://<your-railway-domain>/api/v1/auth/google/callback
+[ ] Click "Save"
+
+================================================================================
+STEP 8: UPDATE RAILWAY REDIRECT URI
+================================================================================
+[ ] Back in Railway "Variables" tab
+[ ] Click "Raw Editor"
+[ ] Add this line:
+    GOOGLE_REDIRECT_URI=https://<your-domain>/api/v1/auth/google/callback
+[ ] Click "Save"
+[ ] Wait for automatic redeployment
+
+================================================================================
+STEP 9: VERIFY DEPLOYMENT
+================================================================================
+Test these URLs (replace <your-domain> with your Railway domain):
+
+[ ] Main app: https://<your-domain>/
+    Expected: Login page appears
+
+[ ] Health check: https://<your-domain>/api/v1/health
+    Expected: {"status":"healthy",...}
+
+[ ] API docs: https://<your-domain>/api/docs
+    Expected: Interactive API documentation
+
+[ ] Google login: Click "Sign in with Google"
+    Expected: Redirects to Google, then back to dashboard
+
+================================================================================
+STEP 10: TEST FEATURES
+================================================================================
+[ ] Login with Google works
+[ ] First user becomes Super Admin
+[ ] Can view Users tab
+[ ] Can create a company
+[ ] Can add new users (+ Add User button)
+[ ] All features working
+
+================================================================================
+🎉 DEPLOYMENT COMPLETE!
+================================================================================
+
+Your app is live at: https://_______________________________
+
+Share with users! 🚀
+
+================================================================================
+📱 BONUS: INSTALL AS MOBILE APP
+================================================================================
+
+On Android (Chrome):
+[ ] Open your Railway URL on phone
+[ ] Chrome shows "Install" prompt
+[ ] Tap "Install"
+[ ] App appears on home screen
+
+On iOS (Safari):
+[ ] Open your Railway URL on phone
+[ ] Tap Share button
+[ ] Tap "Add to Home Screen"
+[ ] App appears on home screen
+
+================================================================================
+🔧 TROUBLESHOOTING
+================================================================================
+
+If something doesn't work:
+
+1. Check deployment logs:
+   Railway → Your Service → Deployments → View Logs
+
+2. Verify environment variables:
+   Railway → Your Service → Variables → Check all are set
+
+3. Check database connection:
+   Railway → Make sure PostgreSQL is in same project
+
+4. Common issues:
+   - SECRET_KEY not set → Generate and add
+   - GOOGLE_CLIENT_ID wrong → Copy from Google Console
+   - Redirect URI mismatch → Must match exactly
+
+================================================================================
+📞 HELP & RESOURCES
+================================================================================
+
+Railway Docs: https://docs.railway.app
+Railway Discord: https://discord.gg/railway
+Detailed Guide: Read DEPLOY_TO_RAILWAY_NOW.md
+
+================================================================================
+
+Time Estimate: 20 minutes total
+Cost: FREE ($5/month credit included)
+Difficulty: Easy ⭐
+
+Good luck! 🚀
+
+================================================================================

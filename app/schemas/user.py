@@ -98,7 +98,7 @@ class UserCreate(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "email": "john.doe@example.com",
                 "full_name": "John Doe",
@@ -175,7 +175,7 @@ class UserUpdate(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "full_name": "John Smith",
                 "can_add_devices": True,
@@ -208,7 +208,7 @@ class UserPermissionsUpdate(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "can_add_devices": True
             }
@@ -269,8 +269,8 @@ class UserResponse(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-        orm_mode = True  # Enable ORM mode for SQLAlchemy models
-        schema_extra = {
+        from_attributes = True  # Enable ORM mode for SQLAlchemy models (Pydantic v2)
+        json_schema_extra = {
             "example": {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "email": "john.doe@example.com",
@@ -322,7 +322,7 @@ class UserListResponse(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "total": 45,
                 "page": 1,

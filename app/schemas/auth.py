@@ -21,7 +21,7 @@ class LoginRequest(BaseModel):
     google_auth_code: Optional[str] = Field(None, description="Google OAuth authorization code")
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "google_auth_code": "4/0AX4XfWh..."
             }
@@ -45,7 +45,7 @@ class TokenResponse(BaseModel):
     user: dict = Field(..., description="User information")
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                 "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -76,7 +76,7 @@ class GoogleAuthURL(BaseModel):
     )
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "auth_url": "https://accounts.google.com/o/oauth2/auth?client_id=..."
             }

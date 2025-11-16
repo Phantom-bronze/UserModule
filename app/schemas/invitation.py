@@ -19,7 +19,7 @@ class InvitationCreate(BaseModel):
     company_id: uuid.UUID = Field(..., description="Company to invite user to")
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "email": "newuser@example.com",
                 "role": "user",
@@ -35,7 +35,7 @@ class InvitationAccept(BaseModel):
     full_name: str = Field(..., min_length=2, max_length=255, description="User's full name")
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "token": "abc123xyz789",
                 "full_name": "John Doe"
@@ -55,4 +55,4 @@ class InvitationResponse(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
